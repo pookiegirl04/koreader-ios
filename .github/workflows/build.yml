@@ -104,6 +104,8 @@ jobs:
 
       # Checkout / fetch. {{{
 
+   # Checkout / fetch. {{{
+
       - name: Checkout
         uses: actions/checkout@v6
         with:
@@ -114,7 +116,7 @@ jobs:
           show-progress: false
 
       - name: Fetch Git Tags
-         run: |
+        run: |
           git fetch --tags --force
           git fetch --tags https://github.com/hezi/koreader-ios.git
 
@@ -122,17 +124,6 @@ jobs:
         run: make fetchthirdparty
 
       # }}}
-
-      - name: Generate cache key
-        run: make TARGET= cache-key
-
-      - name: Restore build directory
-        id: build-restore
-        uses: actions/cache/restore@v5
-        with:
-          path: build
-          key: ${{ env.CACHE_KEY }}-build-${{ hashFiles('cache-key') }}
-
       # Restore / setup build cache. {{{
 
       - name: Lookup or restore build cache
