@@ -239,6 +239,7 @@ jobs:
     # Generate / upload iOS IPA artifact. {{{
 
   # Generate / upload iOS IPA artifact. {{{
+# Generate / upload iOS IPA artifact. {{{
 
       - name: Install iOS Prerequisites
         run: |
@@ -246,10 +247,12 @@ jobs:
             gettext gnu-getopt libtool make meson nasm ninja pkgconf sdl3 \
             util-linux xcodegen
 
-      - name: Generate Xcode Project
+      - name: Build KOReader Base Libraries
         run: |
           export PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$(brew --prefix)/opt/gnu-getopt/bin:$(brew --prefix)/opt/make/libexec/gnubin:$(brew --prefix)/opt/util-linux/bin:${PATH}"
+          make TARGET=macos base || true
           make TARGET=ios xcodeproj
+          make TARGET=ios base
 
       - name: Build iOS App and Create IPA
         run: |
@@ -259,13 +262,13 @@ jobs:
             -scheme KOReader \
             -sdk iphoneos \
             -configuration Release \
+            -derivedDataPath build \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            PATH="$PATH"
+            CODE_SIGNING_ALLOWED=NO
 
           mkdir -p Payload
-          cp -r build/Release-iphoneos/KOReader.app Payload/
+          cp -r build/Build/Products/Release-iphoneos/KOReader.app Payload/
           zip -r koreader-ios.ipa Payload
 
       - name: Upload IPA Artifact
@@ -273,6 +276,8 @@ jobs:
         with:
           name: koreader-ios-ipa
           path: koreader-ios.ipa
+
+      # }}}
 
       # }}}
 
