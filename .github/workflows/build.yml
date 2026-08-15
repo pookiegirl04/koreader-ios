@@ -106,6 +106,8 @@ jobs:
 
    # Checkout / fetch. {{{
 
+    # Checkout / fetch. {{{
+
       - name: Checkout
         uses: actions/checkout@v6
         with:
@@ -115,10 +117,11 @@ jobs:
           filter: tree:0
           show-progress: false
 
-      - name: Fetch Git Tags
+      - name: Fetch Git Tags & Create Version File
         run: |
-          git fetch --tags --force
-          git fetch --tags https://github.com/hezi/koreader-ios.git
+          git remote add upstream https://github.com/koreader/koreader.git || true
+          git fetch upstream --tags --force || true
+          echo "v2026.01-0-g$(git rev-parse --short HEAD)_$(date +%Y-%m-%d)" > git-rev
 
       - name: Fetch
         run: make fetchthirdparty
