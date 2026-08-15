@@ -214,16 +214,51 @@ jobs:
 
       # Generate / upload artifact. {{{
 
-      - name: Generate artifact
-        # Note: ensure the build skeleton is created, so there are no dangling
-        # symlinks (e.g. `data/dict`) to trip 7zip during artifact generation…
-        run: make skeleton update --assume-old=base
+    # Dump & check binaries. {{{
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v7
+      - name: Dump binaries runtime path & dependencies
+        run: make bininfo
+
+      - name: Checking binaries for missing dependencies
+        run: make bincheck
+
+      # }}}
+
+      - name: Save build directory
+        uses: actions/cache/save@v5
+        if: steps.build-restore.outputs.cache-hit != 'true'
         with:
-          archive: false
-          path: '*.7z'
+          path: build
+          key: ${{ steps.build-restore.outputs.cache-primary-key }}
+
+      # - name: Test
+      #   run: ./base/utils/fake_tty.py make --assume-old=base testfront
+
+      # Generate / upload iOS IPA artifact. {{{
+
+      - name: Generate Xcode Project
+        run: make TARGET=ios xcodeproj
+
+      - name: Build iOS App and Create IPA
+        run: |
+          xcodebuild build \
+            -project KOReader.xcodeproj \
+            -scheme KOReader \
+            -sdk iphoneos \
+            -configuration Release \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+          mkdir -p Payload
+          cp -r build/Release-iphoneos/KOReader.app Payload/
+          zip -r koreader-ios.ipa Payload
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: koreader-ios-ipa
+          path: koreader-ios.ipa
 
       # }}}
 
