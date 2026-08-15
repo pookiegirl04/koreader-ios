@@ -236,6 +236,11 @@ jobs:
 
       # Generate / upload iOS IPA artifact. {{{
 
+    # Generate / upload iOS IPA artifact. {{{
+
+      - name: Install iOS Prerequisites
+        run: brew install xcodegen gnu-getopt
+
       - name: Generate Xcode Project
         run: make TARGET=ios xcodeproj
 
@@ -260,6 +265,8 @@ jobs:
           name: koreader-ios-ipa
           path: koreader-ios.ipa
 
+      # }}}
+    
       # }}}
 
 # vim: foldmethod=marker foldlevel=0
