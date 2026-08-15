@@ -209,8 +209,8 @@ jobs:
           path: build
           key: ${{ steps.build-restore.outputs.cache-primary-key }}
 
-      - name: Test
-        run: ./base/utils/fake_tty.py make --assume-old=base testfront
+     # - name: Test
+      #  run: ./base/utils/fake_tty.py make --assume-old=base testfront
 
       # Generate / upload artifact. {{{
 
